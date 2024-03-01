@@ -1,5 +1,5 @@
 ## 基本数据类型
-| 类型 | 最大长度（字符数） | 默认长度 | 说明|
+| 类型 | 最大长度（字符数） | 默认长度 | 说明 |
 |---|---|---|---|
 | C | 1~262143个字符       | 1 字符   | |
 | N | 1~262143个字符       | 1 字符   | 0到9之间字符组成的数字字符串 |
@@ -75,8 +75,185 @@ WRITE: 'One Team One Goal!',
        / |{ str1 } { str2 }|,
        / |{ str1 } { str2 } 这句话一共有： { strlen( str1 && ` ` && str2 ) } 个字符。|.
 ~~~
-**Result:**
-
+**Result:**<br>
 ![STR](../../images/Basics/STR.png)
 
 <!-- ============================================================分割线=====================================================================-->
+
+## 字符串常用操作
+> **取前N位**
+
+~~~abap
+a = a(N). "取前N位
+a = a+N(2). "取第N位后的2位
+a = a+N . "取第N位后的所有字符
+~~~
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+> **`SPLIT` {c} `AT` {del} `INTO` {c1} ... {cn}.**<br>
+> **`SPLIT` {c} `AT` {del} `INTO` TABLE {itab}.**
+- 作用：按照分割字符del把字符串c分割成c1…cn或放到内表中的相应字段。
+
+~~~abap
+DATA: str1 TYPE string VALUE 'One Team/One Goal!',
+      str2 TYPE string VALUE '',
+      str3 TYPE string VALUE ''.
+
+SPLIT str1 AT '/' INTO str2 str3.
+WRITE: |str2: { str2 }|,
+       / |str3: { str3 }|.
+~~~
+
+**Result:**<br>
+![STR](../../images/Basics/SPLIT.png)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+> **`SHIFT` {c} `[BY {n} PLACES]` `[{mode}]`.**
+- 作用：位移字符串n个位置的字符，如果n未指定，默认为1，如果指定的n小于等于0，则字符串不变。如果n超出字符串的长度，则字符串变空，所以在做此操作的时候要注意n的指定。可以首先获得该字符串的长度，方法：len＝STRLEN(C)。
+- mode：指定字符串位移的方向。
+  1. LEFT：从左边位移。
+  2. RIGHT：从右边位移'。
+  3. CIRCULAR：把左边的字符放到右边。
+
+~~~abap
+DATA: str1 TYPE string VALUE 'One Team One Goal!',
+      str2 TYPE string VALUE 'One Team One Goal!',
+      str3 TYPE string VALUE 'One Team One Goal!'.
+
+SHIFT: str1 BY 8 PLACES LEFT,
+       str2 BY 8 PLACES RIGHT,
+       str3 BY 8 PLACES CIRCULAR.
+
+WRITE: str1,
+       / str2,
+       / str3.
+~~~
+
+**Result:**<br>
+![STR](../../images/Basics/SHIFT1.png)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+> **`SHIFT` {c} `UP TO` {str} `[{mode}]`.**
+- 作用：在字符串{c}中以{str}为起点进行位移，同样可以指定mode，原理同上。
+
+~~~abap
+DATA: str1 TYPE string VALUE 'One Team One Goal!',
+      str2 TYPE string VALUE 'One Team One Goal!',
+      str3 TYPE string VALUE 'One Team One Goal!'.
+
+SHIFT: str1 UP TO 'Team' LEFT,
+       str2 UP TO 'Team' RIGHT,
+       str3 UP TO 'Team' CIRCULAR.
+
+WRITE: str1,
+       / str2,
+       / str3.
+~~~
+
+**Result:**<br>
+![STR](../../images/Basics/SHIFT2.png)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+> **`SHIFT` {c} `LEFT DELETING LEADING` {str}.**<br>
+> **`SHIFT` {c} `RIGHT DELETING TRAILING` {str}.**<br>
+- 作用：字符串{c}左边的第一个字符或右边的最后一个字符出现在 {str} 中，该语句将字段{c}向左或向右移动。字段右边或左边用空格填充。
+
+~~~abap
+DATA: str1 TYPE string VALUE '/20240101/',
+      str2 TYPE string VALUE '/20240101/',
+      str3 TYPE string VALUE '/20240101/'.
+
+SHIFT str2 LEFT DELETING LEADING '/'.
+SHIFT str3 RIGHT DELETING TRAILING '/'.
+
+WRITE: str1,
+       / str2,
+       / str3.
+~~~
+
+**Result:**<br>
+![STR](../../images/Basics/SHIFT3.png)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+> **`CONDENSE` {c} `[NO-GAPS]`.**<br>
+- 作用：去掉字符串中的前面和后面的空格，如果指定NO-GAPS，则去掉字符串中的所有空格。
+
+~~~abap
+DATA: str1 TYPE string VALUE ' One Team One Goal! ',
+      str2 TYPE string VALUE ' One Team One Goal! ',
+      str3 TYPE string VALUE ' One Team One Goal! '.
+
+CONDENSE str2.
+CONDENSE str3 NO-GAPS.
+
+WRITE: str1,
+       / str2,
+       / str3.
+~~~
+
+**Result:**<br>
+![STR](../../images/Basics/CONDENSE.png)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+> **`strlen(str)`、`Xstrlen(str)`**
+- 作用：计算字符串长度，String类型的尾部空格会纳入计算，但C类型的变量尾部空格不会纳入计算。
+
+~~~abap
+DATA: str1 TYPE string VALUE 'One Team One Goal!',
+      str2 TYPE c LENGTH 30 VALUE 'One Team One Goal!'.
+
+str1 = |{ str1 }   |.
+str2 = |{ str2 }   |.
+
+
+WRITE: |{ strlen( str1 ) }|,
+       / |{ strlen( str2 ) }|.
+~~~
+
+**Result:**<br>
+![STR](../../images/Basics/STRLEN.png)
+
+<!-- ============================================================分割线=====================================================================-->
+
+## ABAP的匹配
+> **字符串中的通配符**
+  1. `*` 多位字符的通配符
+  2. `+` 一位字符的通配符
+  3. `#` 字符操作中的转义符
+
+> **OPEN SQL where条件中通配符**
+  1. `%` 多位字符的通配符
+  2. `_` 一位字符的通配符
+  3. `ESCAPE` Where条件中转义符
+
+> **CO|CN|CA|NA|CS|NS|CP|NP**
+
+| 语法 | 英文 | 描述 | 含义 | 备注 |
+|---|---|---|---|---|
+| CO | Contain Only                | 仅包含       | str1中仅含有str2的字符       | 区分大小写，比较尾部空格 |
+| CN | Contain Not Only            | 包含以外     | str1中包含str2中以外的字符   | 区分大小写，比较尾部空格 |
+| CA | Contain Any                 | 包含任意     | str1中至少包含str2中任一字符 | 区分大小写，比较尾部空格 |
+| NA | Contain Not Any             | 不包含任意   | str1中不包含str2中任何的字符 | 区分大小写，比较尾部空格 |
+| CS | Contain String              | 包含字符串   | str1中包含str2整个字符串     | 不区分，不比较 |
+| NS | Contain Not String          | 不包含字符串 | str1中不包含str2整个字符串   | 不区分，不比较 |
+| CP | Conforms To Pattern         | 符合模式     | str1符合str2的模式          | 不区分，不比较 |
+| NP | Dose Not Conform To Pattern | 不符合模式   | str1不符合str2的模式        | 不区分，不比较 |
+
+<!-- ============================================================分割线=====================================================================-->
+
+## CLEAR & REFRESH & FREE
+> **针对内表< itab >**
+- 如果使用带表头的内表，`CLEAR` < itab >仅清除表格工作区域。使用`REFRESH` < itab >或`CLEAR` < itab >[]来清空整个内表。
+- `REFRESH` 是专门清楚内表的，`REFRESH` < itab >或`REFRESH` < itab >[]都只清除内表内容，清除基本类型变量用`CLEAR`。
+- `CLEAR`和`REFRESH`都不会释放掉内表所占用的空间，如果想初始化内表的同时还要释放所占用的空间，请使用：`FREE` < itab >.
+
+<!-- ============================================================分割线=====================================================================-->
+
+## FORM传参
