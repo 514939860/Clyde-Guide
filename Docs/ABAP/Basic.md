@@ -196,7 +196,6 @@ WRITE: str1,
        / str2,
        / str3.
 ~~~
-
 **Result:**<br>
 ![STR](../../images/Basics/CONDENSE.png)
 
@@ -216,7 +215,6 @@ str2 = |{ str2 }   |.
 WRITE: |{ strlen( str1 ) }|,
        / |{ strlen( str2 ) }|.
 ~~~
-
 **Result:**<br>
 ![STR](../../images/Basics/STRLEN.png)
 
@@ -252,8 +250,98 @@ WRITE: |{ strlen( str1 ) }|,
 > **针对内表< itab >**
 - 如果使用带表头的内表，`CLEAR` < itab >仅清除表格工作区域。使用`REFRESH` < itab >或`CLEAR` < itab >[]来清空整个内表。
 - `REFRESH` 是专门清楚内表的，`REFRESH` < itab >或`REFRESH` < itab >[]都只清除内表内容，清除基本类型变量用`CLEAR`。
-- `CLEAR`和`REFRESH`都不会释放掉内表所占用的空间，如果想初始化内表的同时还要释放所占用的空间，请使用：`FREE` < itab >.
+- `CLEAR`和`REFRESH`都不会释放掉内表所占用的空间，如果想初始化内表的同时还要释放所占用的空间，请使用：`FREE` < itab >。
 
 <!-- ============================================================分割线=====================================================================-->
 
-## FORM传参
+## TABLES & USING & CHANGING
+> **TABLES**
+- `TYPE`与`LIKE`后面只能接标准内表类型或标准内表对象，如果接排序内表或者哈希内表，只能使用`USING`或`CHANGE`。
+- 当`TABLES`接带表头的内表时`（lt_table）`,表头和内表都会被传递过去。
+- 当`TABLES`接无表头的内表或只传递了内表时`（lt_table[]）`,系统会自动为内表参数变量创建一个局部空的表头。
+
+> **USING & CHANGING 引用传递时效果一样**
+- `USING`
+
+~~~abap
+DATA: num1 TYPE i VALUE 100,
+      num2 TYPE i VALUE 200,
+      num3 TYPE i.
+
+PERFORM add USING num1 num2 num3.
+
+WRITE: |{ num1 } + { num2 } = { num3 }|.
+
+FORM add USING num1 TYPE i
+               num2 TYPE i
+               num3 TYPE i.
+  num3 = num1 + num2.
+ENDFORM.
+~~~
+- `CHANGE`
+
+~~~abap
+DATA: num1 TYPE i VALUE 100,
+      num2 TYPE i VALUE 200,
+      num3 TYPE i.
+
+PERFORM add USING num1 num2 CHANGING num3.
+
+WRITE: |{ num1 } + { num2 } = { num3 }|.
+
+FORM add USING num1 TYPE i
+               num2 TYPE i
+         CHANGING num3 TYPE i.
+  num3 = num1 + num2.
+ENDFORM.
+~~~
+**Result:**<br>
+![STR](../../images/Basics/USING1.png)
+
+> **USING & CHANGING 值传递**
+- `CHANGING`会在perform执行结束后才修改实参变量，`CHANGING`的引用传递和结果传递的结果时一样的，只是修改时机不一样。
+
+~~~abap
+DATA: num1 TYPE i VALUE 100,
+      num2 TYPE i VALUE 200,
+      num3 TYPE i.
+
+PERFORM add USING num1 num2 CHANGING num3.
+
+WRITE:/ |在子程序外：num1={ num1 } num3= { num3 }|.
+
+FORM add USING VALUE(num1) TYPE i
+               VALUE(num2) TYPE i
+         CHANGING num3 TYPE i.
+
+  num1 = num1 + num2.
+  num3 = num1 + num2.
+
+  WRITE: |在子程序外：num1={ num1 } num3= { num3 }|.
+ENDFORM.
+~~~
+**Result:**<br>
+![STR](../../images/Basics/USING2.png)
+
+> **USING & CHANGING 值传递并返回结果**
+
+~~~abap
+DATA: num1 TYPE i VALUE 100,
+      num2 TYPE i VALUE 200,
+      num3 TYPE i.
+
+PERFORM add USING num1 num2 CHANGING num3.
+
+WRITE:/ |子程序执行后：num1={ num1 } num3= { num3 }|.
+
+FORM add USING num1 TYPE i
+               num2 TYPE i
+         CHANGING VALUE(num4) TYPE i.
+
+  num1 = num1 + num2.
+  num4 = num1 + num2.
+
+  WRITE: |子程序执行中：num1={ num1 } num3= { num3 }|.
+~~~
+**Result:**<br>
+![STR](../../images/Basics/CHANGE1.png)

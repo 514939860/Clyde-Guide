@@ -6,6 +6,7 @@
 
 * ABAP
   * [基础](/Docs/ABAP/Basic.md)
+  * [OPEN SQL](/Docs/ABAP/OPEN_SQL.md)
 
 * 各个模块
   * [PP](/Docs/Module/PP.md)
