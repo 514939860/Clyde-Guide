@@ -1,6 +1,8 @@
 ## PARAMETERS
+
 > **代码示例**
-~~~abap
+
+```abap
 TABLES marc.
 
 "基本声明
@@ -35,15 +37,18 @@ SELECTION-SCREEN BEGIN OF BLOCK block4 WITH FRAME TITLE TEXT-h04.
               r2 RADIOBUTTON GROUP g1,
               r3 RADIOBUTTON GROUP g1.
 SELECTION-SCREEN END OF BLOCK block4.
-~~~
-**Result:**<br>
+```
+
+**Result:**
 ![PARAMETERS](../../images/Screen/PARAMETERS.png)
 
 <!-- ============================================================分割线=====================================================================-->
 
 ## SELECT-OPTIONS
+
 > **代码示例**
-~~~abap
+
+```abap
 TABLES marc.
 
 SELECTION-SCREEN BEGIN OF BLOCK block5 WITH FRAME TITLE TEXT-h05.
@@ -63,15 +68,18 @@ SELECTION-SCREEN BEGIN OF BLOCK block6 WITH FRAME TITLE TEXT-h06.
                   s9  FOR marc-werks NO-EXTENSION,                                "隐藏复选框
                   s10 FOR marc-werks NO INTERVALS.                                "隐藏HIGH值
 SELECTION-SCREEN END OF BLOCK block6.
-~~~
-**Result:**<br>
+```
+
+**Result:**
 ![SELECT-OPTIONS](../../images/Screen/SELECT-OPTIONS.png)
 
 <!-- ============================================================分割线=====================================================================-->
 
 ## SELECTION-SCREEN
+
 > **代码示例**
-~~~abap
+
+```abap
 "画线
 SELECTION-SCREEN ULINE 5(50).
 SELECTION-SCREEN ULINE /10(72).
@@ -102,15 +110,18 @@ SELECTION-SCREEN BEGIN OF LINE.
   PARAMETERS r3 RADIOBUTTON GROUP g1.
   SELECTION-SCREEN COMMENT (30) TEXT-t03 FOR FIELD r3.
 SELECTION-SCREEN END OF LINE.
-~~~
-**Result:**<br>
+```
+
+**Result:**
 ![SELECTION-SCREEN](../../images/Screen/SELECTION-SCREEN.png)
 
 <!-- ============================================================分割线=====================================================================-->
 
 ## PUSHBUTTON
+
 > **代码示例**
-~~~abap
+
+```abap
 SELECTION-SCREEN PUSHBUTTON 1(20) text-b01 USER-COMMAND press.
 SELECTION-SCREEN SKIP 1.
 SELECTION-SCREEN PUSHBUTTON 1(20) text-b02 USER-COMMAND dot.
@@ -122,21 +133,24 @@ AT SELECTION-SCREEN.
     WHEN 'DOT'.
       MESSAGE i398(00) WITH '好点！'.
   ENDCASE.
-~~~
+```
+
 > 运行程序 `RSTXICON` 查看所需要的图标代码，`@图标代码@`写入text里面保存激活,在屏幕上就可以得到我们想要的图标。
 
 ![TEXT-ELEMENTS](../../images/Screen/TEXT-ELEMENTS.png)
 ![ICON](../../images/Screen/ICON.png)
-**Result:**<br>
+**Result:**
 ![PUSHBUTTON](../../images/Screen/PUSHBUTTON.png)
 
 <!-- ============================================================分割线=====================================================================-->
 
 ## 屏幕控制
+
 > **注意：要设置USER-COMMAND，否则MODIFY SCREEN没有效果。**
 
 > **代码示例**
-~~~abap
+
+```abap
 TABLES marc.
 
 PARAMETERS r1 RADIOBUTTON GROUP g1 DEFAULT 'X' USER-COMMAND u1.
@@ -192,15 +206,18 @@ FORM modify_screen.
     MODIFY SCREEN.
   ENDLOOP.
 ENDFORM.
-~~~
-**Result:**<br>
+```
+
+**Result:**
 ![SCREEN-CONTROL](../../images/Screen/SCREEN-CONTROL.png)
 
 <!-- ============================================================分割线=====================================================================-->
 
 ## 根据内表动态生成选择条件
+
 > **代码示例**
-~~~abap
+
+```abap
 DATA: g_selection_id  TYPE rsdynsel-selid,
       g_where_clauses TYPE rsds_twhere.
 
@@ -336,6 +353,7 @@ FORM write_condition.
 
   WRITE l_result.
 ENDFORM.
-~~~
-**Result:**<br>
+```
+
+**Result:**
 ![DYNAMIC-FILTER](../../images/Screen/DYNAMIC-FILTER.png)

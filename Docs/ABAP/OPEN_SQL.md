@@ -1,6 +1,8 @@
 ## SELECT
+
 > **OPEN SQL中标准的代码语法样例**
-~~~
+
+```
 SELECT [SINGLE/DISTINCT/AGGREGATE] <fields>/<field as field name>
   FROM <table>
   [WHERE <condition>]
@@ -39,71 +41,79 @@ FOR ALL ENTRIES IN <internal table>：可选项，表示使用内部表中的值
 <n>：可选项，表示返回的最大行数。
 <hint>：可选项，用于优化数据库查询。
 <CORRESPONDING FIELDS OF>：可选项，匹配字段名和内表栏位名赋值。
-~~~
-
-<!-- ============================================================分割线=====================================================================-->
+```
 
 ## INSERT
+
 > **插入单条**
-~~~abap
+
+```abap
 INSERT INTO <tabname> VALUES wa.
 INSERT      <tabname> FROM wa.
-~~~
+```
+
 > **插入多条**
-~~~abap
+
+```abap
 INSERT <tabname> FROM TABLE it_tab [ACCEPTING DUPLICATE KEYS].
 
 - 说明：
 [ACCEPTING DUPLICATE KEYS]：遇到重复键值的跳过不插入，非重复键值的数据插入。
                             插入的数据中只要有一条记录键值是重复的，sy-subrc返回的结果都是非0
-~~~
-
-<!-- ============================================================分割线=====================================================================-->
+```
 
 ## UPDATE
+
 > **更新单条**
-~~~abap
+
+```abap
 UPDATE <tabname> FROM wa.
-~~~
+```
+
 > **更新多条**
-~~~abap
+
+```abap
 UPDATE <tabname> FROM TABLE it_tab.
 UPDATE <tabname> SET <field> = <value> WHERE <condition>.
-~~~
-
-<!-- ============================================================分割线=====================================================================-->
+```
 
 ## DELETE
+
 > **删除单条**
-~~~abap
+
+```abap
 DELETE <tabname> FROM wa.
-~~~
+```
+
 > **删除多条**
-~~~abap
+
+```abap
 DELETE <tabname> FROM TABLE it_tab.
 DELETE FROM <tabname> WHERE <condition>.
-~~~
-
-<!-- ============================================================分割线=====================================================================-->
+```
 
 ## MODIFY
+
 > **修改单条**
-~~~abap
+
+```abap
 MODIFY <tabname> FROM wa.
-~~~
+```
+
 > **修改多条**
-~~~abap
+
+```abap
 MODIFY <tabname> FROM TABLE it_tab.
 MODIFY <tabname> FROM VALUE #( <field> = <value> )
                       TRANSPORTING <field>
                       WHERE <condition>.
-~~~
-
-<!-- ============================================================分割线=====================================================================-->
+```
 
 ## RANGE
+
 > **定义方式**
-~~~abap
+
+```abap
 DATA r_range LIKE RANGE OF <object> WITH HEADER LINE.
 SELECT-OPTIONS r_range FOR <object>.
 
@@ -120,42 +130,44 @@ END OF r_range.
 
 option: high 字段为空，则取值可以为：EQ（=）、NE（<>）、GT（>）、GE（>=）、LE（<=）、LT（<）
         CP、NP、CP（集合之内的数据）和NP（集合之外数据）只有当在输入字段中使用了通配符（“*”或“+”）时它们才是有效的
-~~~
-
-<!-- ============================================================分割线=====================================================================-->
+```
 
 ## FOR ALL ENTRIES
+
 > **注意事项**
-  1. 使用该选项后，对于最后得出的结果集系统会自动删除重复行。因此如果你要保留重复行记录时，记得在SELECT语句中添加足够字段。
 
-  2. FOR ALL ENTRIES IN后面使用的内部表itab如果为空，将查出当前CLIENT端所有数据（即忽略整个WHERE语句，即使Where后面还有其它条件,其他条件都会被忽略）。
+1. 使用该选项后，对于最后得出的结果集系统会自动删除重复行。因此如果你要保留重复行记录时，记得在SELECT语句中添加足够字段。
+2. FOR ALL ENTRIES IN后面使用的内部表itab如果为空，将查出当前CLIENT端所有数据（即忽略整个WHERE语句，即使Where后面还有其它条件,其他条件都会被忽略）。
+3. 内表中的条件字段不能使用BETWEEN、LIKE、IN比较操作符。
+4. 使用该语句时，ORDER BY语句和HAVING语句将不能使用。
+5. 使用该语句时，除COUNT( * )（并且如果有了COUNT函数，则不能再选择其他字段，只能使用在Select ... ENDSelect语句中了）以外的所有合计函数（MAX,MIN,AVG,SUM）都不能使用。
 
-  3. 内表中的条件字段不能使用BETWEEN、LIKE、IN比较操作符。
+> **HINTS**
 
-  4. 使用该语句时，ORDER BY语句和HAVING语句将不能使用。
+1. 使用FOR ALL ENTRY 两个栏位以上的，可以使用如下语句可以提升性能。
 
-  5. 使用该语句时，除COUNT( * )（并且如果有了COUNT函数，则不能再选择其他字段，只能使用在Select ... ENDSelect语句中了）以外的所有合计函数（MAX,MIN,AVG,SUM）都不能使用。
+   ```abap
+   %_HINTS HDB 'prefer_join_with_fda 1&&max_blocking_factor 888&'
+   ```
+2. 只有一个栏位的话，使用如下hints。
 
-<!-- ============================================================分割线=====================================================================-->
+   ```abap
+   %_HINTS HDB 'prefer_in_itab_opt 1&&max_in_blocking_factor 888&'
+   ```
 
 ## INNER JOIN & LEFT OUTER JOIN
+
 > **图示**
 
 ![JOIN](../../images/OPEN_SQL/JOIN.png)
 
 > **注意事项**
-  1. 必需有ON条件语句，且多个条件之间只能使用AND连接。
 
-  2. 每个条件表达式中两个操作数之中必须有一个字段是来自于JOIN右表。
-
-  3. 如果是LEFT OUTER JOIN，则至少有一个条件表达式的两个操作数一个是来自于左表，另一个来自右表。
-
-  4. 不能使用NOT、LIKE、IN（但如果是 INNER JOIN，则>、<、BETWEEN …AND、<>都可用）。
-
-  5. 如果是LEFT OUTER JOIN，则只能使用等号操作符：(=、EQ)。
-
-  6. 如果是LEFT OUTER JOIN，同一右表不能多次出现在不同的LEFT OUTER JOIN的ON条件表达式中。
-
-  7. LEFT OUTER JOIN的右表所有字段不能出现在WHERE中。
-
-  8. 如果是LEFT OUTER JOIN，则在同一个ON条件语句中只能与同一个左表进行关联。
+1. 必需有ON条件语句，且多个条件之间只能使用AND连接。
+2. 每个条件表达式中两个操作数之中必须有一个字段是来自于JOIN右表。
+3. 如果是LEFT OUTER JOIN，则至少有一个条件表达式的两个操作数一个是来自于左表，另一个来自右表。
+4. 不能使用NOT、LIKE、IN（但如果是 INNER JOIN，则>、<、BETWEEN …AND、<>都可用）。
+5. 如果是LEFT OUTER JOIN，则只能使用等号操作符：(=、EQ)。
+6. 如果是LEFT OUTER JOIN，同一右表不能多次出现在不同的LEFT OUTER JOIN的ON条件表达式中。
+7. LEFT OUTER JOIN的右表所有字段不能出现在WHERE中。
+8. 如果是LEFT OUTER JOIN，则在同一个ON条件语句中只能与同一个左表进行关联。

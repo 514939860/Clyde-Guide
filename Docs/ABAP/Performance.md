@@ -1,12 +1,15 @@
 ## LOOP WHERE
+
 > **要点**
-1. 根据`WHERE`条件对内表进行排序。
-2. 使用`BINARY SEARCH`来获取符合条件的第一笔记录。
-3. 使用索引来`LOOP`内表。
-4. `LOOP`中添加`IF`判断，`LOOP`到不符合条件的资料时退出`LOOP`。
+
+1. 根据 `WHERE`条件对内表进行排序。
+2. 使用 `BINARY SEARCH`来获取符合条件的第一笔记录。
+3. 使用索引来 `LOOP`内表。
+4. `LOOP`中添加 `IF`判断，`LOOP`到不符合条件的资料时退出 `LOOP`。
 
 > **代码示例**
-~~~abap
+
+```abap
 DATA: BEGIN OF lt_material occurs 0,
         werks LIKE marc-werks,
         matnr LIKE marc-matnr,
@@ -29,28 +32,31 @@ READ TABLE lt_material WITH KEY werks = 'FXXX'
       ...  "此处插入要处理的逻辑
     ENDLOOP.
   ENDIF.
-~~~
+```
 
 <!-- ============================================================分割线=====================================================================-->
 
 ## LOOP 嵌套 LOOP
+
 > **要点**
-1. 根据`WHERE`条件对内表进行排序。
-2. 使用`BINARY SEARCH`来获取符合条件的第一笔记录。
-3. 使用索引来`LOOP`内表。
-4. `LOOP`中添加`IF`判断，`LOOP`到不符合条件的资料时退出`LOOP`。
+
+1. 根据 `WHERE`条件对内表进行排序。
+2. 使用 `BINARY SEARCH`来获取符合条件的第一笔记录。
+3. 使用索引来 `LOOP`内表。
+4. `LOOP`中添加 `IF`判断，`LOOP`到不符合条件的资料时退出 `LOOP`。
 
 > **代码示例**
-~~~abap
+
+```abap
 DATA: BEGIN OF lt_matnr1 occurs 0,
         werks LIKE marc-werks,
         matnr LIKE marc-matnr,
       END OF lt_matnr1,
 
-      BEGIN OF lt_matnr1 occurs 0,
+      BEGIN OF lt_matnr2 occurs 0,
         werks LIKE marc-werks,
         matnr LIKE marc-matnr,
-      END OF lt_matnr1.
+      END OF lt_matnr2.
 
 DATA l_tabix LIKE sy-tabix.
 
@@ -72,4 +78,4 @@ LOOP AT lt_matnr1
       ENDLOOP.
     ENDIF.
 ENDLOOP.
-~~~
+```
